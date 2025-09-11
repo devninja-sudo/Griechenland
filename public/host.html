@@ -9,6 +9,9 @@
   <h1>Host Controls</h1>
 
   <div id="miniplayer" style="display:flex;align-items:center;gap:12px;">
+    <iframe src="https://musical-halibut-5gg64xqgjw56hq64-3000.app.github.dev/" width="600" height="600">
+
+    </iframe>
     <video id="hostPlayer" width="280" playsinline muted></video>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <div id="nowPlaying">Now: step 1</div>
@@ -22,6 +25,7 @@
         <button onclick="startShow()" id="startShowBtn">Start Show</button>
         <input type="number" id="stepInput" min="1" value="1" style="width:80px;">
         <button onclick="jumpToStep()">Jump</button>
+        <button onclick="stoptimestand(4)">stop at Timestand</button>
       </div>
     </div>
   </div>
