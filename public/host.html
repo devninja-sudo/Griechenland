@@ -9,7 +9,42 @@
   <h1>Host Controls</h1>
 
   <div id="miniplayer" style="display:flex;align-items:center;gap:12px;">
-    <iframe src="https://musical-halibut-5gg64xqgjw56hq64-3000.app.github.dev/" width="600" height="600">
+    <iframe id="remoteFrame" width="600" height="600" data-default="https://griechenland.onrender.com/"></iframe>
+    <script>
+      // Determine iframe URL in order of preference:
+      // 1) ?remote=<url> query parameter
+      // 2) If running on localhost, use http://localhost:3000/ (or same origin)
+      // 3) Use data-default attribute
+      (function(){
+        const iframe = document.getElementById('remoteFrame');
+        const params = new URLSearchParams(window.location.search);
+        const remoteParam = params.get('remote');
+        function isLocalHost() {
+          return ['localhost','127.0.0.1','::1'].includes(window.location.hostname);
+        }
+
+        if (remoteParam) {
+          try {
+            // allow passing full URL or hostname
+            const url = new URL(remoteParam.includes('://') ? remoteParam : (window.location.protocol + '//' + remoteParam));
+            iframe.src = url.href;
+            return;
+          } catch(e) {
+            console.warn('Invalid remote param, falling back to defaults', e);
+          }
+        }
+
+        if (isLocalHost()) {
+          // default to same-origin root or localhost:3000 if different
+          const localDefault = window.location.origin !== 'null' ? window.location.origin + '/' : 'http://localhost:3000/';
+          iframe.src = localDefault;
+          return;
+        }
+
+        // fallback to data-default attribute
+        iframe.src = iframe.getAttribute('data-default') || '';
+      })();
+    </script>
 
     </iframe>
     <video id="hostPlayer" width="280" playsinline muted></video>
