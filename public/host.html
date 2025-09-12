@@ -57,7 +57,9 @@
         <button onclick="setStep(currentStep+1)">Next</button>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
-        <button onclick="startShow()" id="startShowBtn">Start Show</button>
+  <button onclick="startShow()" id="startShowBtn">Start Show</button>
+  <button onclick="requestGoLive()" id="goLiveBtn">Go Live</button>
+  <button id="checkFilesBtn">Check Files</button>
         <input type="number" id="stepInput" min="1" value="1" style="width:80px;">
         <button onclick="jumpToStep()">Jump</button>
         <button onclick="stoptimestand(4)">stop at Timestand</button>

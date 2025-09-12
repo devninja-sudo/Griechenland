@@ -1,0 +1,13 @@
+{
+  "steps": [
+    { "id": 1, "file": "step1.webm", "label": "Kamerafahrt, Oeffnung" },
+    { "id": 2, "file": "step2.webm", "label": "Strom an" },
+    { "id": 3, "file": "step3.webm", "label": "Hallo Tippen" }
+  ],
+  "transitions": {
+    "start-1": "transitions_start-1.webm",
+    "1-2": "transition_1to2.webm"
+  },
+  "defaultTransition": "transition_1to2.webm",
+  "start": "start.webm"
+}
