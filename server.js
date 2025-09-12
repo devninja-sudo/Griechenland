@@ -21,6 +21,7 @@ io.on('connection', (socket) => {
   socket.on('play', () => io.emit('play'));
   socket.on('pause', () => io.emit('pause'));
   socket.on('mute', (muted) => io.emit('mute', muted));
+  socket.on('pauseattimestand', (timestand) => io.emit('pauseattimestand', timestand));
 });
 
 server.listen(PORT, () => {

@@ -127,6 +127,25 @@ socket.on('play', () => {
 socket.on('pause', () => {
   player.pause();
 });
+
+socket.on('pauseattimestand', (timestand) => {
+
+  const checkInterval = setInterval(() => {
+    if (Math.abs(player.currentTime-timestand) < 0.05) {
+      player.pause();
+      clearInterval(checkInterval);
+    }
+    console.log('Checking timestand', Math.abs(player.currentTime-timestand), 'abweichung zu ', timestand);
+  }, 100);
+
+  // Stoppe den Timer, falls das Video pausiert wird (z.B. manuell)  Warum Keine Ahnung
+  const onPause = () => {
+    clearInterval(checkInterval);
+    player.removeEventListener('pause', onPause);
+  };
+  player.addEventListener('pause', onPause);
+});
+
 socket.on('mute', (muted) => {
   player.muted = !!muted;
 });

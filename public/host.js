@@ -113,6 +113,10 @@ function startShow() {
   hostPlayStep(currentStep).catch(()=>{});
 }
 
+function stoptimestand(timestand) {
+  socket.emit("pauseattimestand", timestand)
+}
+
 // React to local changes so host player mirrors controls immediately
 window.setStep = (step) => {
   if (step < 1) return;
