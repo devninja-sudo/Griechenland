@@ -323,6 +323,8 @@ socket.on('pause', () => {
   player.pause();
 });
 
+
+
 socket.on('pauseattimestand', (timestand) => {
 
   const checkInterval = setInterval(() => {
@@ -343,4 +345,104 @@ socket.on('pauseattimestand', (timestand) => {
 
 socket.on('mute', (muted) => {
   player.muted = !!muted;
+});
+
+
+
+const canvas = document.getElementById('overlay');
+const ctx = canvas.getContext('2d');
+
+const points = [];
+
+/**
+ * Punkt hinzufügen (erscheint sofort und verschwindet nach Dauer)
+ * @param {number} x - X-Koordinate
+ * @param {number} y - Y-Koordinate
+ * @param {number} color_r - Rot (0–255)
+ * @param {number} color_g - Grün (0–255)
+ * @param {number} color_b - Blau (0–255)
+ * @param {number} size - Radius in px
+ * @param {boolean} pulsating - Soll der Punkt pulsieren?
+ * @param {boolean} onvideo - (hier noch ungenutzt, z.B. für Canvas-Positionierung)
+ * @param {number} duration - Lebensdauer in ms
+ * @param {number} opacity - Start-Deckkraft (0–1)
+ */
+function addPoint(
+  x, y,
+  color_r = 0, color_g = 0, color_b = 255,
+  size = 10, pulsating = false,
+  onvideo = true,
+  duration = 5000, opacity = 0.7
+) {
+  points.push({
+    x,
+    y,
+    color_r,
+    color_g,
+    color_b,
+    size,
+    pulsating,
+    onvideo,
+    duration,
+    opacity,
+    createdAt: Date.now()
+  });
+}
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  points.length = 0; 
+}
+
+function render() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const now = Date.now();
+  for (let i = points.length - 1; i >= 0; i--) {
+    const p = points[i];
+    const age = now - p.createdAt;
+
+    if (age > p.duration) {
+      // Punkt abgelaufen -> entfernen
+      points.splice(i, 1);
+      continue;
+    }
+
+    // Transparenz berechnen (nimmt linear ab)
+    const alpha = Math.max(0, p.opacity * (1 - age / p.duration));
+
+    // Radius berechnen
+    let radius = p.size;
+    if (p.pulsating) {
+      // Pulsierender Effekt: Sinus zwischen 0.8x und 1.2x
+      const pulseSpeed = 3; // Frequenz (je höher desto schneller)
+      const pulse = Math.sin((now - p.createdAt) / 500 * pulseSpeed);
+      radius = p.size * (1 + 0.2 * pulse); // ±20%
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${p.color_r}, ${p.color_g}, ${p.color_b}, ${alpha})`;
+    ctx.fill();
+  }
+
+  requestAnimationFrame(render);
+}
+
+// Rendering starten
+render();
+
+// Beispiel: Punkte
+//setTimeout(() => addPoint(100, 100, 70, 255, 255, 50, true, true, 5000, 0.9), 0);  // pulsierend
+//setTimeout(() => addPoint(200, 150, 255, 0, 0, 30, false, true, 5000, 0.8), 1000); // normal
+//setTimeout(() => addPoint(300, 200, 0, 255, 0, 40, true, true, 5000, 0.6), 3000);  // pulsierend
+
+// Socket: Punkt von Server hinzufügen
+socket.on('drawPoint', (x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity) => {
+  console.log("Client got point drawing command: "+ x + " / "+ y + " col: "+ color_r + " / "+ color_g + " / "+ color_b + " size: "+ size + " puls: "+ pulsating + " onvid: "+ onvideo + " dur: "+ duration + " opac: "+ opacity);
+  addPoint(x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity);
+});
+
+socket.on('clearDrawing', () => {
+  clearCanvas();
 });

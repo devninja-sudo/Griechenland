@@ -57,13 +57,30 @@
         <button onclick="setStep(currentStep+1)">Next</button>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
-  <button onclick="startShow()" id="startShowBtn">Start Show</button>
-  <button onclick="requestGoLive()" id="goLiveBtn">Go Live</button>
-  <button id="checkFilesBtn">Check Files</button>
+        <button onclick="startShow()" id="startShowBtn">Start Show</button>
+        <button onclick="requestGoLive()" id="goLiveBtn">Go Live</button>
+        <button id="checkFilesBtn">Check Files</button>
         <input type="number" id="stepInput" min="1" value="1" style="width:80px;">
         <button onclick="jumpToStep()">Jump</button>
-        <button onclick="stoptimestand(4)">stop at Timestand Base</button>
+        <button onclick="stoptimestand(4)">stop at Timestand Base</button><br><br>
       </div>
+        <label for="CursorRefreshRate">Cursor Refresh Rate (ms):
+        <input type="number" id="CursorRefreshRate" min="10" value="100" step="10" style="width:80px;"></label>
+
+        <label for="CursorSize">Cursor Size (px):
+        <input type="number" id="CursorSize" min="1" value="10" step="1" style="width:80px;"></label>
+
+        <label for="CursorColorR">Cursor Color Red (0-255):
+        <input type="text" id="CursorColorR" min="1" max="255" value="20" step="1" style="width:80px;"></label>
+        <label for="CursorColorG">Cursor Color Green (0-255):
+        <input type="text" id="CursorColorG" min="1" max="255" value="20" step="1" style="width:80px;"></label>
+        <label for="CursorColorB">Cursor Color Blue (0-255):
+        <input type="text" id="CursorColorB" min="1" max="255" value="20" step="1" style="width:80px;"></label>
+        <label for="CursorOpacity">Cursor Opacity (0.0-1.0):
+        <input type="text" id="CursorOpacity" min="0.0" max="1.0" value="0.8" step="0.1" style="width:80px;"></label>
+
+        <label for="showCursor">Show Cursor:        
+        <input type="checkbox" id='CursorVisibility' onchange="updateCursorVisibility()" id="showCursor" checked style="width:800px;"></label>
     </div>
   </div>
   <script src="/socket.io/socket.io.js"></script>

@@ -1,3 +1,73 @@
+// Warte bis das iframe geladen ist und füge den Listener hinzu
+
+
+
+///** 
+window.addEventListener('DOMContentLoaded', () => {
+  const iframe = document.getElementById('remoteFrame');
+  iframe.addEventListener('load', () => {
+    try {
+      const player = iframe.contentWindow.document.getElementById('player');
+      if (player) {
+        player.addEventListener('mousemove', function(event) {
+          const coords = getVideoPixelCoordinates(player, event);
+          globalThis.coords = coords;
+          //console.log('Pixelkoordinaten im Video:', coords);
+        });
+      } else {
+        console.warn('Kein Video-Element im iframe gefunden.');
+      }
+    } catch (e) {
+      console.error('Fehler beim Zugriff auf das Video im iframe:', e);
+    }
+  });
+});
+
+//*/
+
+/**
+ * Gibt die Pixelkoordinaten im Video zurück, über denen sich der Mauszeiger befindet.
+ * @param {HTMLVideoElement} video - Das Video-Element
+ * @param {MouseEvent} event - Das Maus-Event
+ * @returns {{x: number, y: number}} Die Pixelkoordinaten im Video
+ */
+function getVideoPixelCoordinates(video, event) {
+  const rect = video.getBoundingClientRect();
+  const scaleX = video.videoWidth / rect.width;
+  const scaleY = video.videoHeight / rect.height;
+  const x = Math.floor((event.clientX - rect.left) * scaleX);
+  const y = Math.floor((event.clientY - rect.top) * scaleY);
+  return { x, y };
+}
+
+// Testfunktion für getVideoPixelCoordinates
+function test_getVideoPixelCoordinates() {
+  // Simuliere ein Video-Element
+  const video = {
+    getBoundingClientRect: () => ({ left: 10, top: 20, width: 200, height: 100 }),
+    videoWidth: 400,
+    videoHeight: 200
+  };
+  // Simuliere ein Maus-Event
+  const event = {
+    clientX: 110, // 100px rechts vom linken Rand
+    clientY: 70   // 50px unterhalb des oberen Rands
+  };
+  const coords = getVideoPixelCoordinates(video, event);
+  // Erwartet: x = (110-10)*2 = 200, y = (70-20)*2 = 100
+  if (coords.x === 200 && coords.y === 100) {
+    console.log('Test erfolgreich:', coords);
+  } else {
+    console.error('Test fehlgeschlagen:', coords);
+  }
+}
+
+
+
+
+
+// Test ausführen
+test_getVideoPixelCoordinates();
 const socket = io();
 let currentStep = 1;
 let showStarted = false;
@@ -31,6 +101,7 @@ function getStepFile(step) {
   if (s && s.file) return s.file;
   return `step${step}.webm`;
 }
+
 function getTransitionFile(from, to) {
   const key = `${from}-${to}`;
   // Only return an explicitly configured transition. Per requirement, do NOT fall back to
@@ -40,6 +111,7 @@ function getTransitionFile(from, to) {
   }
   return null;
 }
+
 function getStartFile() {
   if (manifest && manifest.start) return manifest.start;
   return 'start.webm';
@@ -259,6 +331,11 @@ function stoptimestand(timestand) {
   socket.emit("pauseattimestand", timestand)
 }
 
+//  socket.on('drawPoint', (x, y, color, size, pulsating, onvideo, duration, opacity) => io.emit('drawPoint', x, y, color, size, pulsating, onvideo, duration, opacity));
+function sendPointDrawingCommand(x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity) {
+  socket.emit('drawPoint', x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity);
+}
+
 // React to local changes so host player mirrors controls immediately
 window.setStep = (step) => {
   if (step < 1) return;
@@ -286,3 +363,46 @@ window.startShow = startShow;
 
 // Expose startShow for button
 window.startShow = startShow;
+
+const ElementCursorVisibilityInput = document.getElementById("CursorVisibility");
+const ElementCursorRefreshRateInput = document.getElementById("CursorRefreshRate");
+const ElementCursorSizeInput = document.getElementById("CursorSize");
+const ElementCursorColorRInput = document.getElementById("CursorColorR");
+const ElementCursorColorGInput = document.getElementById("CursorColorG");
+const ElementCursorColorBInput = document.getElementById("CursorColorB");
+const ElementCursorOpacityInput = document.getElementById("CursorOpacity");
+
+cursorIntervalId = null;
+function sendCursor(duration){
+  let coords = globalThis.coords;
+  console.log("Habe "+ coords.x + " / "+ coords.y);
+  console.log(ElementCursorColorRInput.value);
+  sendPointDrawingCommand(coords.x, coords.y, ElementCursorColorRInput.value, ElementCursorColorGInput.value, ElementCursorColorBInput.value, ElementCursorSizeInput.value, false, true, duration, ElementCursorOpacityInput.value);
+}
+
+function updateCursorVisibility() {
+  let active = ElementCursorVisibilityInput.checked;
+  console.log("Setze Cursor Visibility auf "+ active);
+  setUpdateCursorVisibility(active);
+}
+
+function setUpdateCursorVisibility(active) {
+  updateCursorVisibilityState = active;
+  
+  
+  if (active) {
+    console.log("Starte Cursor Interval");
+    if (!cursorIntervalId) {
+      cursorIntervalId = setInterval(() => {
+        if (updateCursorVisibilityState) {
+          sendCursor(CursorRefreshRate.value);
+        }
+      }, CursorRefreshRate.value);
+    }
+  } else {
+    if (cursorIntervalId) {
+      clearInterval(cursorIntervalId);
+      cursorIntervalId = null;
+    }
+  }
+}
