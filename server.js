@@ -59,16 +59,6 @@ io.on('connection', (socket) => {
   socket.on('pause', () => io.emit('pause'));
   socket.on('mute', (muted) => io.emit('mute', muted));
   socket.on('pauseattimestand', (timestand) => io.emit('pauseattimestand', timestand));
-
-  socket.on('drawRect', (xstart, ystart, xend, yend, pulsating, color, onvideo, duration, opacity) => {
-    io.emit('drawRect', xstart, ystart, xend, yend, pulsating, color, onvideo, duration, opacity);
-  });
-  socket.on('drawPoint', (x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity) => {
-    console.log("Server got point drawing command: "+ x + " / "+ y + " col: "+ color_r + " / "+ color_g + " / "+ color_b + " size: "+ size + " puls: "+ pulsating + " onvid: "+ onvideo + " dur: "+ duration + " opac: "+ opacity);
-    io.emit('drawPoint', x, y, color_r, color_g, color_b, size, pulsating, onvideo, duration, opacity);
-  });
-  socket.on('clearDrawing', () => io.emit('clearDrawing'));
-
 });
 
 // Bind to 0.0.0.0 to ensure IPv4 localhost (127.0.0.1) works on all platforms
