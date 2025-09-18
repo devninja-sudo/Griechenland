@@ -40,6 +40,7 @@ function getTransitionFile(from, to) {
   }
   return null;
 }
+
 function getStartFile() {
   if (manifest && manifest.start) return manifest.start;
   return 'start.webm';

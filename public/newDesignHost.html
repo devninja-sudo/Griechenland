@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enigma Demo Host - New Design</title>
+    <link rel="stylesheet" href="newDesignHost.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="newDesignHost.js" defer></script>
+</head>
+<body>
+    <h1>Enigma Demo Host</h1>
+    <div class="controlClips">
+        <div class="liveView">
+            <iframe id="liveFrame" src="index.html"></iframe>
+        </div>
+        <div class="verticalControls">
+            <button id="startButton" onclick="startShow()" class="vertical startButton">I</button>
+            <button id="stopButton" class="vertical stopButton">🔌</button>
+            <button id="muteButton" onclick="mute()" class="vertical muteButton mute">🎙️</button>
+            <button id="goLiveButton" onclick="goLive()" class="vertical goLiveButton ">🔴</button>
+        </div>
+        <div class="horizontalControls">
+            <button onclick="pause()" id="playButton" class="horizontal playButton">❚❚</button><br>
+            <span id="SzeneName" class="SzeneName">Szenenname: WAS</span>
+            <div class="horizontal arrowButtons">
+                <button onclick="backScene()" id="backButton" class="horizontal arrow backButton">⬅</button>
+                
+                <button onclick="nextScene()" id="forwardButton" class="horizontal arrow forwardButton">➡</button>
+            </div>
+        </div>
+    </div>
+    <label for="JumpCheckbox" class="JumpCheckbox">Jump:</label>
+    <input type="checkbox"  id="JumpCheckbox" class="JumpCheckbox">
+    <div id="ClipTimestampControll" class="ClipTimestampControll">
+
+    </div>
+    
+</body>
+</html>

@@ -1,13 +1,25 @@
 {
   "steps": [
-    { "id": 1, "file": "step1.webm", "label": "Kamerafahrt, Oeffnung" },
-    { "id": 2, "file": "step2.webm", "label": "Strom an" },
-    { "id": 3, "file": "step3.webm", "label": "Hallo Tippen" }
+    { "id": 1, "file": "start.webm", "label": "Idle" },
+    { "id": 2, "file": "step1.webm", "label": "Kamerafahrt, Oeffnung" },
+    { "id": 3, "file": "step2.webm", "label": "Strom an" },
+    { "id": 4, "file": "step3.webm", "label": "Hallo Tippen" },
+    { "id": 5, "file": "walze_moremetal.mp4", "label": "Walzen animation" }
   ],
   "transitions": {
     "start-1": "transitions_start-1.webm",
     "1-2": "transition_1to2.webm"
   },
+  "Timestamps": [
+    { "stepid": 5, "Timestamp": 6, "name": "Ende Raumfahrt Enigma" },
+    { "stepid": 5, "Timestamp": 10, "name": "Tastendruck Leuchtfeld" },
+    { "stepid": 5, "Timestamp": 13.5, "name": "Anfang Kamera zu Walze" },
+    { "stepid": 5, "Timestamp": 16.2, "name": "Walzen Cover" },
+    { "stepid": 5, "Timestamp": 21.6, "name": "Walzen Ansicht" },
+    { "stepid": 5, "Timestamp": 22, "name": "Walze I drehen bei Tastendruck" },
+    { "stepid": 5, "Timestamp": 24, "name": "Walze II drehen, wenn I rum" },
+    { "stepid": 5, "Timestamp": 26, "name": "Walze III drehen, wenn II rum" }
+  ],
   "defaultTransition": "transition_1to2.webm",
   "start": "start.webm"
 }

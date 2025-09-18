@@ -10,6 +10,7 @@ const io = new Server(server);
 // Keep track of the last scheduled live state (host schedules) so "go live" can broadcast it
 let serverLiveState = null;
 
+let Serverstep = 1; 
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -23,9 +24,11 @@ io.on('connection', (socket) => {
   }
   socket.on('changeStep', (step) => {
     io.emit('setStep', step);
+    Serverstep = step;
   });
   socket.on('startShow', (step) => {
     io.emit('startShow', step);
+    Serverstep = step;
   });
   // time synchronization request: reply immediately with server time
   socket.on('timeSync', (payload, cb) => {
@@ -43,10 +46,14 @@ io.on('connection', (socket) => {
     io.emit('scheduledStep', data);
     // store last scheduled (server-wide)
     serverLiveState = data;
+    Serverstep = data.step;
   });
 
+
+  
   // Host requests viewers be sent to the live position now
   socket.on('requestGoLive', () => {
+    Serverstep = 1; 
     // broadcast current live state to all clients
     if (serverLiveState) {
       io.emit('goLive', serverLiveState);
@@ -55,10 +62,27 @@ io.on('connection', (socket) => {
       io.emit('goLive', { step: null, at: Date.now() });
     }
   });
+
+  socket.on('stopShow', () => {
+    io.emit('goLive', { step: null, at: Date.now() });
+    serverLiveState = null;
+    Serverstep = 1; 
+  });
+
+
+
+  socket.on('getActStep', () => socket.emit('ActStepReport', Serverstep));
+
   socket.on('play', () => io.emit('play'));
   socket.on('pause', () => io.emit('pause'));
   socket.on('mute', (muted) => io.emit('mute', muted));
-  socket.on('pauseattimestand', (timestand) => io.emit('pauseattimestand', timestand));
+  socket.on('pauseattimestand', (timestand) => {
+    io.emit('pauseattimestand', timestand)
+  });
+  
+  socket.on('JumpToTimestamp', (timestand) => {
+    io.emit('JumpToTimestamp', timestand)
+  });
 });
 
 // Bind to 0.0.0.0 to ensure IPv4 localhost (127.0.0.1) works on all platforms

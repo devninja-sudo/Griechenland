@@ -212,6 +212,10 @@ socket.on('startShow', (step) => {
   playStep(currentStep);
 });
 
+socket.on('JumpToTimestamp', (timestand) => {
+  player.currentTime = timestand;
+});
+
 // Scheduled step: server provides absolute server timestamp 'at' in ms
 socket.on('scheduledStep', async (data) => {
   // data: { step, at }
