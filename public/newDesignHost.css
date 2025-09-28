@@ -146,10 +146,20 @@ button:hover {
     margin-bottom: 0.1em;
 }
 
+
+.horizontalControls .JumpToSceneButton {
+    margin-top: -0.2em;
+    color: rgb(0, 223, 0);
+    font-size: 5em;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+}
+
 .horizontalControls .arrow {
     margin-top: -0.3em;
     color: rgb(0, 223, 0);
-    font-size: 9em;
+    font-size: 5em;
     padding: 0;
     background-color: transparent;
     border: none;

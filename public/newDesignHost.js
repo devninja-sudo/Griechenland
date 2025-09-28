@@ -34,6 +34,13 @@ const SzeneName = document.getElementById('SzeneName');
 const goLiveButton = document.getElementById('goLiveButton');
 const TimeStampsControll = document.getElementById('ClipTimestampControll');
 const JumpCheckbox = document.getElementById('JumpCheckbox');
+const PauseAtTimestampCheckbox = document.getElementById('PauseAtTimestampCheckbox');
+
+const ClientCounter = document.getElementById('ClientCounter');
+ClientCounter.innerText = `Zuschauer: 0`;
+
+const PauseAtTimestampControll = document.getElementById('PauseAtTimestampControll');
+PauseAtTimestampControll.style.display = "none";
 
 window.onload = async () => {
     await StepUpdateEvent(await getActStep());
@@ -69,7 +76,7 @@ function timestandFunction(timestand){
 }
 
 function jumpToTimestamp(timestand) {
-  socket.emit("JumpToTimestamp", timestand); 
+  socket.emit("JumpToTimestamp", timestand, PauseAtTimestampCheckbox.checked); 
 }
 socket.on('play', () => {
     paused = false;
@@ -88,6 +95,16 @@ socket.on('pauseattimestand', () => {
     paused = false;
     playButton.textContent = '❚?❚';
     playButton.onclick = pause;
+});
+
+socket.on('JumpToTimestamp', async (timestamp, pause) => {
+  if (pause) {
+    setTimeout(() => {
+    paused = true;
+    playButton.textContent = '▶';
+    playButton.onclick = play;
+    }, 20);
+  }
 });
 
 socket.on('ActStepReport', (step) => {
@@ -180,3 +197,29 @@ function stoptimestand(timestand) {
 }
 
 
+function JumpToScene(){
+  changeStep(prompt("Zu welcher Szene möchtest du springen?") || getActStep());
+}
+
+
+function toggleCheckboxJumpTimestamp(){
+  if(JumpCheckbox.checked){
+    PauseAtTimestampControll.style.display = "inline";
+  }else{
+    PauseAtTimestampControll.style.display = "none";
+  }
+}
+
+function CountClientsRequest() {
+  return new Promise((resolve) => {
+    // Einmaligen Listener setzen
+    socket.once('ClientCountResponse', (count) => {
+      resolve(count);
+      let clientCount = count;
+      ClientCounter.innerText = `Zuschauer: ${clientCount}`;
+    });
+    socket.emit('ClientCountRequest');
+  });
+}
+CountClientsRequest();
+setInterval(CountClientsRequest, 10000); // alle 10 Sekunden aktualisieren

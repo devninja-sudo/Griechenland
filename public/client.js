@@ -212,8 +212,15 @@ socket.on('startShow', (step) => {
   playStep(currentStep);
 });
 
-socket.on('JumpToTimestamp', (timestand) => {
-  player.currentTime = timestand;
+socket.on('JumpToTimestamp', async (timestamp, pause) => {
+
+
+  player.currentTime = timestamp;
+  if (pause) {
+    setTimeout(() => {
+    player.pause()
+    }, 50);
+  }
 });
 
 // Scheduled step: server provides absolute server timestamp 'at' in ms
@@ -249,6 +256,8 @@ socket.on('scheduledStep', async (data) => {
 
   setTimeout(start, delay);
 });
+
+
 
 socket.on('setStep', (step) => {
   if (!showStarted) return;
@@ -348,3 +357,5 @@ socket.on('pauseattimestand', (timestand) => {
 socket.on('mute', (muted) => {
   player.muted = !!muted;
 });
+
+

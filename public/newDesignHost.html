@@ -10,6 +10,8 @@
 </head>
 <body>
     <h1>Enigma Demo Host</h1>
+    <span> Ein Host zählt als 2 Zuschauer</span>
+    <div id="ClientCounter" class="ClientCounter">Zuschauer: 0</div>
     <div class="controlClips">
         <div class="liveView">
             <iframe id="liveFrame" src="index.html"></iframe>
@@ -25,13 +27,17 @@
             <span id="SzeneName" class="SzeneName">Szenenname: WAS</span>
             <div class="horizontal arrowButtons">
                 <button onclick="backScene()" id="backButton" class="horizontal arrow backButton">⬅</button>
-                
+                <button onclick="JumpToScene()" id="JumpToSceneButton" class="horizontal JumpToSceneButton">🟢</button>
                 <button onclick="nextScene()" id="forwardButton" class="horizontal arrow forwardButton">➡</button>
             </div>
         </div>
     </div>
     <label for="JumpCheckbox" class="JumpCheckbox">Jump:</label>
-    <input type="checkbox"  id="JumpCheckbox" class="JumpCheckbox">
+    <input type="checkbox"  onchange="toggleCheckboxJumpTimestamp()" id="JumpCheckbox" class="JumpCheckbox">
+    <div id="PauseAtTimestampControll"> 
+        <label for="PauseAtTimestampCheckbox" class="PauseAtTimestampCheckbox">Pause at Jumped Timestamp:</label>
+        <input type="checkbox"  id="PauseAtTimestampCheckbox" class="PauseAtTimestampCheckbox">
+    </div>
     <div id="ClipTimestampControll" class="ClipTimestampControll">
 
     </div>
