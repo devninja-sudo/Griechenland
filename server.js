@@ -15,6 +15,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+function printConnectedClients() {
+  const clients = Array.from(io.sockets.sockets.keys());
+  return clients;
+}
+
 io.on('connection', (socket) => {
   // If a live state is already scheduled, send it to the newly connected socket so
   // new clients join at the current live position immediately.
@@ -80,8 +85,12 @@ io.on('connection', (socket) => {
     io.emit('pauseattimestand', timestand)
   });
   
-  socket.on('JumpToTimestamp', (timestand) => {
-    io.emit('JumpToTimestamp', timestand)
+  socket.on('JumpToTimestamp', (timestand, pause) => {
+    io.emit('JumpToTimestamp', timestand, pause)
+  });
+
+  socket.on('ClientCountRequest', () => {
+    socket.emit('ClientCountResponse', printConnectedClients().length);
   });
 });
 
@@ -89,3 +98,5 @@ io.on('connection', (socket) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+
