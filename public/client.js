@@ -1,4 +1,5 @@
 // Client-side player controller
+const pausetime = 200;
 const socket = io();
 const player = document.getElementById('player');
 
@@ -213,6 +214,7 @@ socket.on('startShow', (step) => {
 });
 
 socket.on('JumpToTimestamp', async (timestamp, pause) => {
+  console.log('Jump to timestamp', timestamp-0.05, 'pause=', pause);
 
 
   player.currentTime = timestamp;
@@ -344,7 +346,7 @@ socket.on('pauseattimestand', (timestand) => {
       clearInterval(checkInterval);
     }
     console.log('Checking timestand', Math.abs(player.currentTime-timestand), 'abweichung zu ', timestand);
-  }, 100);
+  }, pausetime);
 
   // Stoppe den Timer, falls das Video pausiert wird (z.B. manuell)  Warum Keine Ahnung
   const onPause = () => {
