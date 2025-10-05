@@ -141,17 +141,23 @@ function loadAndPlay(src, loop = false) {
 
     const onCan = () => {
       if (token !== playbackToken) return; // stale
+  // remove listeners to avoid leaks
+  player.removeEventListener('canplay', onCan);
+  player.removeEventListener('error', onErr);
       player.play().catch(() => {});
       resolve();
     };
+
     const onErr = (e) => {
       if (token !== playbackToken) return; // stale
+      player.removeEventListener('canplay', onCan);
+      player.removeEventListener('error', onErr);
       reject(new Error('video load error'));
     };
 
-    // assign handlers
-    player.oncanplay = onCan;
-    player.onerror = onErr;
+    // assign handlers using addEventListener so we can remove them reliably
+    player.addEventListener('canplay', onCan);
+    player.addEventListener('error', onErr);
   });
 }
 
@@ -168,12 +174,16 @@ async function playStep(step) {
     fadeIn();
   } finally {
     isTransitioning = false;
-    // handle queued step
+    // handle queued step locally (avoid re-emitting and races)
     if (queuedStep !== null && queuedStep !== currentStep) {
       const next = queuedStep;
       queuedStep = null;
-      // small delay to ensure state settles
-      setTimeout(() => socket.emit('changeStep', next), 50);
+      // small delay to ensure state settles, then transition locally
+      setTimeout(() => {
+        const from = currentStep;
+        currentStep = next;
+        playTransitionAndStep(from, next).catch(()=>{});
+      }, 50);
     }
   }
 }
@@ -193,9 +203,13 @@ async function playTransitionAndStep(fromStep, toStep) {
     // try transition first
     await loadAndPlay(transitionSrc, false);
     fadeIn();
-    // wait for transition to end
+    // wait for transition to end, using event listener and then remove it
     await new Promise((resolve) => {
-      player.onended = () => resolve();
+      const onEnded = () => {
+        player.removeEventListener('ended', onEnded);
+        resolve();
+      };
+      player.addEventListener('ended', onEnded);
     });
     // then play the target step
     await playStep(toStep);
@@ -262,7 +276,7 @@ socket.on('scheduledStep', async (data) => {
 
 
 socket.on('setStep', (step) => {
-  if (!showStarted) return;
+  // Accept setStep at any time (allows preview updates and avoids ignoring signals).
   if (step === currentStep) return;
   // If already transitioning, queue the latest requested step
   if (isTransitioning) {

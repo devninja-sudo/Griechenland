@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
   
   // Host requests viewers be sent to the live position now
   socket.on('requestGoLive', () => {
-    Serverstep = 1; 
     // broadcast current live state to all clients
     if (serverLiveState) {
       io.emit('goLive', serverLiveState);
